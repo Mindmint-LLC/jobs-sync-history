@@ -9,5 +9,7 @@ google-cloud-bigquery
 matplotlib
 pytz
 numpy==1.23.5
-
-
+streamlit_oauth==0.1.14
+authlib
+google-auth
+google-auth-oauthlib
