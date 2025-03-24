@@ -1,5 +1,8 @@
 FROM python:3.10-slim
 
+# Install git
+RUN apt-get update && apt-get install -y git
+
 WORKDIR /app
 
 COPY requirements.txt ./
@@ -7,7 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Optional: If you're using .env file for environment variables
 RUN pip install python-dotenv
 
 EXPOSE 8501
