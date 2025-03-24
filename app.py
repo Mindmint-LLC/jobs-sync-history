@@ -77,13 +77,10 @@ if "code" in st.query_params:
 
     st.write(f"Welcome {user_info['name']}!")
     st.write(f"Email: {user_info['email']}")
-
+    st.session_state.authenticated
 else:
     # User has not authenticated, show login message
-    st.write("You need to log in to proceed.")
-    st.stop()
-
-
+    st.write("You are already logged in!")
 
 
 # New Color Palette
