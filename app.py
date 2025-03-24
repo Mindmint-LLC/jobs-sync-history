@@ -42,9 +42,7 @@ api_base_url = "https://www.googleapis.com/oauth2/v1"
 client = OAuth2Session(client_id, client_secret, redirect_uri=redirect_uri)
 
 # Define the scope of permissions you need (in this case, basic user info)
-scope = ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
-
-# Generate the authorization URL and state
+scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
 authorization_url, state = client.create_authorization_url(authorization_url, scope=scope)
 
 
