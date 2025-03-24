@@ -62,8 +62,9 @@ if not st.session_state.authenticated:
 
 # Once redirected to the redirect URI, you will capture the authorization code
 # and then fetch the token from Google
-if "code" in st.query_params:
-    code = st.query_params["code"][0]
+query_params = st.experimental_get_query_params()
+if "code" in query_params:
+    code = query_params["code"][0]
 
     # Fetch the token using the authorization code
     token = client.fetch_token(token_url, code=code)
