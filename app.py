@@ -69,7 +69,7 @@ if not st.session_state.authenticated:
     st.stop()
 else:
     user_info = client.get(f"{api_base_url}/userinfo", token=st.session_state.token).json()
-    st.write(f"✅ Logged in as: **{user_info['name']} ({user_info['email']})**"
+    st.write(f"✅ Logged in as: **{user_info['name']} ({user_info['email']})**")
 
 
 # New Color Palette
