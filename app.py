@@ -58,33 +58,27 @@ st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide
 
 query_params = st.query_params
 
-# Handle redirect from Google
-if "code" in query_params:
-    code = query_params["code"][0]
-    
-    try:
-        token = client.fetch_token(token_url, code=code)
-        st.session_state.token = token
-        st.session_state.authenticated = True
-        
-        user_info = client.get(f"{api_base_url}/userinfo").json()
-        st.session_state.user_info = user_info
-        
-        st.success(f"Welcome {user_info['name']}!")
-    except Exception as e:
-        st.error("Authentication failed.")
+if not st.session_state.get("authenticated", False):
+    if "code" in query_params:
+        code = query_params["code"]
+        if isinstance(code, list):
+            code = code[0]
+
+        try:
+            token = client.fetch_token(token_url, code=code)
+            st.session_state.token = token
+            st.session_state.authenticated = True
+
+            # Optional: Clean the URL (remove ?code=...)
+            st.experimental_set_query_params()  # resets URL to base
+        except Exception as e:
+            st.error("OAuth failed.")
+            st.stop()
+
+    else:
+        # Not authenticated and no code — show login
+        st.markdown(f"[🔐 Login with Google]({authorization_url})")
         st.stop()
-
-# If not authenticated yet, show login
-elif not st.session_state.get("authenticated", False):
-    st.markdown(f"Please log in with Google:")
-    st.markdown(f"[Login with Google]({authorization_url})")
-    st.stop()
-
-# Already authenticated
-else:
-    user_info = st.session_state.get("user_info", {})
-    st.write(f"Welcome back, {user_info.get('name', 'User')}!")
 
 
 
