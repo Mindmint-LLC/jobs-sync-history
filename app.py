@@ -34,7 +34,7 @@ client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
 redirect_uri = os.getenv('REDIRECT_URI') 
 
 # OAuth2.0 authorization URL for Google
-authorization_url = "https://accounts.google.com/o/oauth2/auth"
+authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
 token_url = "https://accounts.google.com/o/oauth2/token"
 userinfo_endpoint = "https://openidconnect.googleapis.com/v1/userinfo"
 
