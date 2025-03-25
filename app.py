@@ -56,36 +56,54 @@ authorization_url, state = client.create_authorization_url(
 
 st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
-query_params = st.experimental_get_query_params()
+# Get query params safely (no deprecation)
+query_params = st.query_params
 
-# Handle redirect from Google
-if "code" in query_params:
-    code = query_params["code"][0]
-    
-    try:
-        token = client.fetch_token(token_url, code=code)
-        st.session_state.token = token
-        st.session_state.authenticated = True
-        
-        user_info = client.get(f"{api_base_url}/userinfo").json()
-        st.session_state.user_info = user_info
-        
-        st.success(f"Welcome {user_info['name']}!")
-    except Exception as e:
-        st.error("Authentication failed.")
+# Step 1: Check if already authenticated
+if not st.session_state.get("authenticated", False):
+
+    # Step 2: Handle OAuth redirect with code
+    if "code" in query_params:
+        code = query_params["code"]
+        if isinstance(code, list):
+            code = code[0]
+
+        try:
+            # Fetch token using authorization code
+            token = client.fetch_token(
+                token_url,
+                code=code,
+                client_id=client_id,
+                client_secret=client_secret
+            )
+
+            # Save token and auth state
+            st.session_state.token = token
+            st.session_state.authenticated = True
+
+            # Optional: fetch user info
+            user_info = client.get(f"{api_base_url}/userinfo").json()
+            st.session_state.user_info = user_info
+
+            # ✅ Clean up the URL (remove ?code=...) then rerun clean
+            st.experimental_set_query_params()
+            st.experimental_rerun()
+
+        except Exception as e:
+            st.error("OAuth failed.")
+            st.exception(e)
+            st.stop()
+
+    # Step 3: No code yet — show login link
+    else:
+        st.markdown(f"🔐 Please log in with Google:")
+        st.markdown(f"[Login with Google]({authorization_url})")
         st.stop()
 
-# If not authenticated yet, show login
-elif not st.session_state.get("authenticated", False):
-    st.markdown(f"Please log in with Google:")
-    st.markdown(f"[Login with Google]({authorization_url})")
-    st.stop()
-
-# Already authenticated
+# Step 4: Already authenticated
 else:
     user_info = st.session_state.get("user_info", {})
-    st.write(f"Welcome back, {user_info.get('name', 'User')}!")
-
+    st.success(f"✅ Welcome back, {user_info.get('name', 'User')}!")
 
 
 # New Color Palette
