@@ -45,35 +45,8 @@ oauth = OAuth2Session(client_id, client_secret, scope=scope, redirect_uri=redire
 
 
 
-@authenticate
-st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
-# First-time login flow
-if "token" not in st.session_state:
-    authorization_url, state = oauth.create_authorization_url(authorize_url)
-    st.session_state.oauth_state = state
-    st.markdown(f"[Login with Google]({authorization_url})")
-    st.stop()
 
-# Handle OAuth callback
-if "code" in st.query_params:
-    token = oauth.fetch_token(token_url, authorization_response=st.request.url)
-    st.session_state.token = token
-
-# Fetch user info
-oauth.token = st.session_state.token
-resp = oauth.get(userinfo_endpoint)
-user_info = resp.json()
-email = user_info["email"]
-
-# ✅ Restrict to Allowed Emails
-allowed_emails = ["victor.akan@mastermind.com", "kyle@deangraziosi.com","tyler@deangraziosi.com","eric.dire@mastermind.com"]
-if email not in allowed_emails:
-    st.error("🚫 Unauthorized access. Please contact admin.")
-    st.stop()
-
-# 🎉 Show app to authorized user
-st.success(f"Welcome, {user_info['name']}!")
 
 # New Color Palette
 PRIMARY_COLOR = "#2E86C1"  # Soft Trustworthy Blue
@@ -195,7 +168,7 @@ st.markdown(
 )
 
 
-
+@authenticate
 @st.cache_data(ttl=60 * 5)
 def fetch_data_from_bigquery(start_date, end_date):
     con = SQL(credentials_filepath=os.getenv('BIGQUERY_CRED'))
