@@ -45,13 +45,18 @@ client = OAuth2Session(client_id, client_secret, redirect_uri=redirect_uri)
 scope = ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
 
 # Generate the authorization URL and state
-authorization_url, state = client.create_authorization_url(authorization_url, scope=scope)
+authorization_url, state = client.create_authorization_url(
+    authorization_url,
+    scope=scope,
+    access_type='offline',
+    prompt='consent'
+)
 
 
 
 st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 
 # Handle redirect from Google
 if "code" in query_params:
