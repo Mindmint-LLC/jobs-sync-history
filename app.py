@@ -42,7 +42,9 @@ api_base_url = "https://www.googleapis.com/oauth2/v1"
 client = OAuth2Session(client_id, client_secret, redirect_uri=redirect_uri)
 
 # Define the scope of permissions you need (in this case, basic user info)
-scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+scope = ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
+
+# Generate the authorization URL and state
 authorization_url, state = client.create_authorization_url(authorization_url, scope=scope)
 
 
@@ -50,24 +52,36 @@ authorization_url, state = client.create_authorization_url(authorization_url, sc
 st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 # Streamlit UI: Show login button or OAuth URL
-query_params = st.experimental_get_query_params()
-
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
-if "code" in query_params and not st.session_state.authenticated:
-    code = query_params["code"][0]
-    token = client.fetch_token(token_url, code=code)
-    st.session_state.token = token
-    st.session_state.authenticated = True
-
 if not st.session_state.authenticated:
-    auth_url, state = client.create_authorization_url(authorization_url, scope=scope)
-    st.markdown(f"🔒 [Login with Google]({auth_url})")
-    st.stop()
+    st.write(f"Please log in with Google by clicking the link below:")
+    st.markdown(f"[Login with Google]({authorization_url})")
+    st.stop()  # This stops the app from rendering until the user is authenticated
+
+# Once redirected to the redirect URI, you will capture the authorization code
+# and then fetch the token from Google
+if "code" in st.query_params:
+    code = st.query_params["code"][0]
+
+    # Fetch the token using the authorization code
+    token = client.fetch_token(token_url, code=code)
+
+    # Save the token in the session
+    st.session_state.authenticated = True
+    st.session_state.token = token
+
+    # Retrieve the user info
+    user_info = client.get(f"{api_base_url}/userinfo").json()
+
+    st.write(f"Welcome {user_info['name']}!")
+    st.write(f"Email: {user_info['email']}")
+    st.session_state.authenticated
 else:
-    user_info = client.get(f"{api_base_url}/userinfo", token=st.session_state.token).json()
-    st.write(f"✅ Logged in as: **{user_info['name']} ({user_info['email']})**")
+    # User has not authenticated, show login message
+    st.write("You are already logged in!")
+
 
 
 # New Color Palette
