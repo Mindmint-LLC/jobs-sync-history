@@ -21,32 +21,16 @@ import pytz  # if using Python <3.9; otherwise use zoneinfo
 import numpy as np
 import warnings
 from authlib.integrations.requests_client import OAuth2Session
-from streamlit_authentication.google_oauth import authenticate
 
 # Load environment variables
 load_dotenv()
 
 
 
-# Google OAuth setup - You'll need to replace these with your credentials
-client_id =  os.getenv('GOOGLE_CLIENT_ID') 
-client_secret = os.getenv('GOOGLE_CLIENT_SECRET') 
-redirect_uri = os.getenv('REDIRECT_URI') 
-
-# OAuth2.0 authorization URL for Google
-authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
-token_url = "https://accounts.google.com/o/oauth2/token"
-userinfo_endpoint = "https://openidconnect.googleapis.com/v1/userinfo"
-
-scope = "openid email profile"
-oauth = OAuth2Session(client_id, client_secret, scope=scope, redirect_uri=redirect_uri)
 
 
 
-
-
-
-
+st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 # New Color Palette
 PRIMARY_COLOR = "#2E86C1"  # Soft Trustworthy Blue
@@ -168,7 +152,6 @@ st.markdown(
 )
 
 
-@authenticate
 @st.cache_data(ttl=60 * 5)
 def fetch_data_from_bigquery(start_date, end_date):
     con = SQL(credentials_filepath=os.getenv('BIGQUERY_CRED'))
