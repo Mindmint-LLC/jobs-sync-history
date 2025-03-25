@@ -61,11 +61,6 @@ authorization_url, state = client.create_authorization_url(
 )
 
 
-
-
-# Get query params safely (no deprecation)
-query_params = st.query_params
-
 if not st.session_state.get("authenticated", False):
     if "code" in query_params:
         code = query_params["code"][0] if isinstance(query_params["code"], list) else query_params["code"]
