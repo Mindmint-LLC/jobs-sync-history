@@ -99,11 +99,6 @@ else:
     st.success(f"✅ Welcome back, {user_info.get('name', 'User')}!")
 
 
-# Step 4: Already authenticated
-else:
-    user_info = st.session_state.get("user_info", {})
-    st.success(f"✅ Welcome back, {user_info.get('name', 'User')}!")
-
 
 # New Color Palette
 PRIMARY_COLOR = "#2E86C1"  # Soft Trustworthy Blue
