@@ -64,7 +64,7 @@ user_info = resp.json()
 email = user_info["email"]
 
 # ✅ Restrict to Allowed Emails
-allowed_emails = ["you@example.com", "teammate@example.com"]
+allowed_emails = ["victor.akan@mastermind.com", "kyle@deangraziosi.com","tyler@deangraziosi.com","eric.dire@mastermind.com"]
 if email not in allowed_emails:
     st.error("🚫 Unauthorized access. Please contact admin.")
     st.stop()
