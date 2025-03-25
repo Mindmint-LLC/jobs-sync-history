@@ -36,65 +36,41 @@ redirect_uri = os.getenv('REDIRECT_URI')
 # OAuth2.0 authorization URL for Google
 authorization_url = "https://accounts.google.com/o/oauth2/auth"
 token_url = "https://accounts.google.com/o/oauth2/token"
-api_base_url = "https://www.googleapis.com/oauth2/v1"
+userinfo_endpoint = "https://openidconnect.googleapis.com/v1/userinfo"
 
 st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 
 
-warnings.simplefilter("ignore", category=DeprecationWarning)
-query_params = st.experimental_get_query_params()
+scope = "openid email profile"
+oauth = OAuth2Session(client_id, client_secret, scope=scope, redirect_uri=redirect_uri)
 
-# Create the OAuth2Session object
-client = OAuth2Session(client_id, client_secret, redirect_uri=redirect_uri)
+# First-time login flow
+if "token" not in st.session_state:
+    authorization_url, state = oauth.create_authorization_url(authorize_url)
+    st.session_state.oauth_state = state
+    st.markdown(f"[Login with Google]({authorization_url})")
+    st.stop()
 
-# Define the scope of permissions you need (in this case, basic user info)
-scope = ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
+# Handle OAuth callback
+if "code" in st.query_params:
+    token = oauth.fetch_token(token_url, authorization_response=st.request.url)
+    st.session_state.token = token
 
-# Generate the authorization URL and state
-authorization_url, state = client.create_authorization_url(
-    authorization_url,
-    scope=scope,
-    access_type='offline',
-    prompt='consent'
-)
+# Fetch user info
+oauth.token = st.session_state.token
+resp = oauth.get(userinfo_endpoint)
+user_info = resp.json()
+email = user_info["email"]
 
+# ✅ Restrict to Allowed Emails
+allowed_emails = ["you@example.com", "teammate@example.com"]
+if email not in allowed_emails:
+    st.error("🚫 Unauthorized access. Please contact admin.")
+    st.stop()
 
-if not st.session_state.get("authenticated", False):
-    if "code" in query_params and "token_used" not in st.session_state:
-        code = query_params["code"][0] if isinstance(query_params["code"], list) else query_params["code"]
-
-        try:
-            token = client.fetch_token(
-                token_url,
-                code=code,
-                client_id=client_id,
-                client_secret=client_secret
-            )
-
-            st.session_state.token = token
-            st.session_state.authenticated = True
-            st.session_state.token_used = True  # Prevent re-use of code
-
-
-            user_info = client.get(f"{api_base_url}/userinfo").json()
-            st.session_state.user_info = user_info
-
-            st.experimental_set_query_params()
-            st.experimental_rerun()
-
-        except Exception as e:
-            st.error("OAuth failed.")
-            st.exception(e)
-            st.stop()
-    else:
-        st.markdown(f"[🔐 Login with Google]({authorization_url})")
-        st.stop()
-else:
-    user_info = st.session_state.get("user_info", {})
-    st.success(f"✅ Welcome back, {user_info.get('name', 'User')}!")
-
-
+# 🎉 Show app to authorized user
+st.success(f"Welcome, {user_info['name']}!")
 
 # New Color Palette
 PRIMARY_COLOR = "#2E86C1"  # Soft Trustworthy Blue
