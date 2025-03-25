@@ -51,36 +51,35 @@ authorization_url, state = client.create_authorization_url(authorization_url, sc
 
 st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
-# Streamlit UI: Show login button or OAuth URL
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
+query_params = st.experimental_get_query_params()
 
-if not st.session_state.authenticated:
-    st.write(f"Please log in with Google by clicking the link below:")
+# Handle redirect from Google
+if "code" in query_params:
+    code = query_params["code"][0]
+    
+    try:
+        token = client.fetch_token(token_url, code=code)
+        st.session_state.token = token
+        st.session_state.authenticated = True
+        
+        user_info = client.get(f"{api_base_url}/userinfo").json()
+        st.session_state.user_info = user_info
+        
+        st.success(f"Welcome {user_info['name']}!")
+    except Exception as e:
+        st.error("Authentication failed.")
+        st.stop()
+
+# If not authenticated yet, show login
+elif not st.session_state.get("authenticated", False):
+    st.markdown(f"Please log in with Google:")
     st.markdown(f"[Login with Google]({authorization_url})")
-    st.stop()  # This stops the app from rendering until the user is authenticated
+    st.stop()
 
-# Once redirected to the redirect URI, you will capture the authorization code
-# and then fetch the token from Google
-if "code" in st.query_params:
-    code = st.query_params["code"][0]
-
-    # Fetch the token using the authorization code
-    token = client.fetch_token(token_url, code=code)
-
-    # Save the token in the session
-    st.session_state.authenticated = True
-    st.session_state.token = token
-
-    # Retrieve the user info
-    user_info = client.get(f"{api_base_url}/userinfo").json()
-
-    st.write(f"Welcome {user_info['name']}!")
-    st.write(f"Email: {user_info['email']}")
-    st.session_state.authenticated
+# Already authenticated
 else:
-    # User has not authenticated, show login message
-    st.write("You are already logged in!")
+    user_info = st.session_state.get("user_info", {})
+    st.write(f"Welcome back, {user_info.get('name', 'User')}!")
 
 
 
