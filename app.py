@@ -38,6 +38,7 @@ authorization_url = "https://accounts.google.com/o/oauth2/auth"
 token_url = "https://accounts.google.com/o/oauth2/token"
 api_base_url = "https://www.googleapis.com/oauth2/v1"
 
+st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 
 # Suppress deprecation warnings temporarily (only for get_query_params)
@@ -61,7 +62,6 @@ authorization_url, state = client.create_authorization_url(
 
 
 
-st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 # Get query params safely (no deprecation)
 query_params = st.query_params
