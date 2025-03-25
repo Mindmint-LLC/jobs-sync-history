@@ -1,4 +1,5 @@
 streamlit==1.36.0
+setuptools>=56.0.0
 git+https://github.com/edire/streamlit-authentication.git
 git+https://github.com/edire/dgsheet.git
 git+https://github.com/edire/dbharbor.git
