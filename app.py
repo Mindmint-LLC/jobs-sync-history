@@ -41,10 +41,9 @@ api_base_url = "https://www.googleapis.com/oauth2/v1"
 st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 
-# Suppress deprecation warnings temporarily (only for get_query_params)
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=DeprecationWarning)
-    query_params = st.experimental_get_query_params()
+
+warnings.simplefilter("ignore", category=DeprecationWarning)
+query_params = st.experimental_get_query_params()
 
 # Create the OAuth2Session object
 client = OAuth2Session(client_id, client_secret, redirect_uri=redirect_uri)
@@ -62,7 +61,7 @@ authorization_url, state = client.create_authorization_url(
 
 
 if not st.session_state.get("authenticated", False):
-    if "code" in query_params:
+    if "code" in query_params and "token_used" not in st.session_state:
         code = query_params["code"][0] if isinstance(query_params["code"], list) else query_params["code"]
 
         try:
@@ -75,6 +74,8 @@ if not st.session_state.get("authenticated", False):
 
             st.session_state.token = token
             st.session_state.authenticated = True
+            st.session_state.token_used = True  # Prevent re-use of code
+
 
             user_info = client.get(f"{api_base_url}/userinfo").json()
             st.session_state.user_info = user_info
