@@ -21,10 +21,10 @@ import pytz  # if using Python <3.9; otherwise use zoneinfo
 import numpy as np
 import warnings
 from authlib.integrations.requests_client import OAuth2Session
-  
+from streamlit_authentication.google_oauth import authenticate
+
 # Load environment variables
 load_dotenv()
-
 
 
 
@@ -38,12 +38,15 @@ authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
 token_url = "https://accounts.google.com/o/oauth2/token"
 userinfo_endpoint = "https://openidconnect.googleapis.com/v1/userinfo"
 
-st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
-
-
-
 scope = "openid email profile"
 oauth = OAuth2Session(client_id, client_secret, scope=scope, redirect_uri=redirect_uri)
+
+
+
+
+
+@authenticate
+st.set_page_config(page_title="📊 Job Tracker", page_icon="📈", layout="wide")
 
 # First-time login flow
 if "token" not in st.session_state:
