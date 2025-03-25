@@ -3,7 +3,7 @@ git+https://github.com/edire/streamlit-authentication.git
 git+https://github.com/edire/dgsheet.git
 git+https://github.com/edire/dbharbor.git
 python-dotenv==0.21.0
-plotly>=5.4.0
+plotly==5.5.0
 pandas
 google-cloud-bigquery
 matplotlib
