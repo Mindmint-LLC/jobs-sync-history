@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12
 
 # Install git
 RUN apt-get update && apt-get install -y git
