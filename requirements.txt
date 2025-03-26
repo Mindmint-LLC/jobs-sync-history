@@ -8,7 +8,4 @@ pandas
 google-cloud-bigquery
 matplotlib
 pytz
-numpy==1.23.5
-authlib
-google-auth
-google-auth-oauthlib
+numpy>=1.26.0
