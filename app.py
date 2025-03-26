@@ -17,10 +17,9 @@ import plotly.express as px
 import streamlit as st
 import plotly.graph_objects as go
 from datetime import datetime,date,timedelta
-import pytz  # if using Python <3.9; otherwise use zoneinfo
+import pytz  
 import numpy as np
 import warnings
-from authlib.integrations.requests_client import OAuth2Session
 
 # Load environment variables
 load_dotenv()
